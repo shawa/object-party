@@ -1,4 +1,20 @@
+# Emacs tempfiles
+**/.#*
+
+# Python venv
 env
 
+# Python Bytecode
 **/*.pyc
 **/__pycache__
+
+# Firefox Addon files
+src/ff_addons
+
+# Measurements
+src/har
+
+# Gecko runtime logs
+**/geckodriver.log
+
+
