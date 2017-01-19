@@ -4,6 +4,8 @@ import time
 import os
 import logging
 
+import clize
+
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from datetime import datetime
@@ -67,22 +69,24 @@ def crawl(driver, urls):
         logger.info("Refreshed")
         time.sleep(10)
         logger.info("Closing dev tools")
-        toggle_network_panel(driver, delay=0)
+        toggle_network_panel(driver, delay=0.5)
 
 
-def main():
+def tourls(domains, protocol='https'):
+    for domain in domains:
+        yield protocol + '://' + domain
+
+
+def main(domainsfile, *, logdir='har'):
     logger.info('Launched crawler')
     driver = get_driver(ABOUT_CONFIG, EXTENSIONS)
 
-    urls = [
-        "https://apple.com",
-        "https://gmail.com",
-        "https://reddit.com",
-    ]
+    with open(domainsfile, 'r') as domains:
+        urls = tourls(domains)
+        crawl(driver, urls)
 
-    crawl(driver, urls)
     driver.close()
 
 
 if __name__ == '__main__':
-    main()
+    clize.run(main)
