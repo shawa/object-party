@@ -1,1 +1,20 @@
-.log.entries[].request.url
+* Object Party
+A collection of scripts to aid in measuring interesting things about the subresources and objects on a web page
+
+** main.py
+#+BEGIN_SRC
+python3 main.py <domains>
+#+END_SRC
+Given a list of domains, ~main.py~ launches a Selenium session, driving Firefox. Firefox is configured to export a ~HAR~ (*H*ttp *AR*chive) for every page it loads, timestamped. The idea is to capture all of the domains for all of the objects on the page, with a view to determining how many of them are owned by the first party, and can thus, potentially, be pushed pre-emptively.
+
+** count-origins.sh
+#+BEGIN_SRC
+./count-origins.sh <input HAR file>
+#+END_SRC
+Given a ~HAR~ which /is assumed to represent one page load only/, parse out the first-party domain (that is the very first request). Then, count the number of occurrences of each unique fetched subresource domain.
+
+** fetch-alt-names.sh
+#+BEGIN_SRC
+./fetch-alt-names.sh <domain counts file>
+#+END_SRC
+Given an output of ~count-origins.sh~, find all of the alternative names for the first party domain.
