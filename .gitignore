@@ -13,7 +13,8 @@ src/ff_addons
 
 # Measurements
 src/har
-src/processed
+src/counted-domains/
+src/alternative-names/
 
 # Gecko runtime logs
 **/geckodriver.log

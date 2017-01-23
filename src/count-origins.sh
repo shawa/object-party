@@ -5,7 +5,7 @@ IFS=$'\n\t'
 readonly INFILE="$1"
 
 domain() {
-    perl -ne '/https:\/\/(.+?)\// and print "$1\n"'
+    perl -ne '/https?:\/\/(.+?)\// and print "$1\n"'
 }
 
 readonly FIRST_PARTY="$(jq '.log.entries[0].request.url' < "$INFILE" | domain)"
