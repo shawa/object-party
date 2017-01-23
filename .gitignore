@@ -13,6 +13,7 @@ src/ff_addons
 
 # Measurements
 src/har
+src/processed
 
 # Gecko runtime logs
 **/geckodriver.log

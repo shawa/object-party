@@ -58,21 +58,32 @@ def crawl(driver, urls):
         driver.find_element_by_tag_name('body').send_keys(Keys.META + Keys.ALT + 'q')
         time.sleep(delay)
 
+    failures = []
     # initial setup, we need the network panel open
     for url in urls:
         logger.info("Fetching {}".format(url))
-        driver.get(url)
+        try:
+            driver.get(url)
+        except Exception as e:
+            logger.error(e)
+            logger.error("Failed to fetch {}, exception below".format(url))
+            failures.append(url)
+            continue
         logger.info("Fetched  {}".format(url))
         toggle_network_panel(driver)
         logger.info("Opened dev tools")
         driver.refresh()
         logger.info("Refreshed")
-        time.sleep(10)
+        time.sleep(15)
         logger.info("Closing dev tools")
         toggle_network_panel(driver, delay=0.5)
 
+    logger.info("Completed")
+    if failures:
+        logger.warn("Failures: {}".format(failures))
 
-def tourls(domains, protocol='https'):
+
+def tourls(domains, protocol='http'):
     for domain in domains:
         yield protocol + '://' + domain
 
