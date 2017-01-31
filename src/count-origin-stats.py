@@ -1,6 +1,7 @@
 import subprocess
 import sys
 import json
+import re
 from collections import defaultdict
 
 
@@ -12,24 +13,18 @@ def alternative_names(domain):
     return frozenset(alts["alts"])
 
 
-def matches(cert_domain, domain):
-    '''
-    match a domain against the one listed in the x509 cert
-    '''
-    # first check they're the same, then otherwise if it's a wildcard match
-    # i.e. www.google.com matches *.google.com
-    return (cert_domain == domain or
-            cert_domain.split('.') == ['*'] + domain.split('.')[1:])
+def to_re(alternative_names):
+    def _to_re_text(alt_name):
+        return re.sub(r'^\*\.', r'.+\.', alt_name)
 
-
-def is_under_cert(cert_domains, domain):
-    return any((matches(cert_domain, domain)
-                for cert_domain in cert_domains))
+    domains_re = re.compile('|'.join(map(_to_re_text, alternative_names)))
+    return re.compile(domains_re)
 
 
 def count_size_and_occurences(filtered_har):
     first_party_name = filtered_har['domain']
     alts = alternative_names(first_party_name)
+    alts_re = to_re(alts)
 
     resp_bytes = defaultdict(int)
     occurences = defaultdict(int)
@@ -44,7 +39,7 @@ def count_size_and_occurences(filtered_har):
     object_stats = [{
         'domain': domain,
         'count': occurences[domain],
-        'is_first_party': is_under_cert(alts, domain),
+        'is_first_party': alts_re.match(domain) is not None,
         'bytes': resp_bytes[domain],
         } for domain in seen_domains
     ]
@@ -61,6 +56,7 @@ def main():
     input_data = json.load(sys.stdin)
     result = count_size_and_occurences(input_data)
     json.dump(result, sys.stdout)
+
 
 if __name__ == '__main__':
     main()
