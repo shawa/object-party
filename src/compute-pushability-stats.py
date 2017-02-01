@@ -32,8 +32,15 @@ def fraction_pushable_objects(dataset):
 
 def analyse_batch_data(origin_stats_dir):
     for dataset_file in os.listdir(origin_stats_dir):
-        with open(f'{origin_stats_dir}/{dataset_file}') as f:
-            dataset = json.load(f)
+        filepath = f'{origin_stats_dir}/{dataset_file}'
+        with open(filepath) as f:
+            try:
+                dataset = json.load(f)
+            except json.decoder.JSONDecodeError as e:
+                sys.stderr.write(f"failed to load {filepath}:\n{e}\n")
+                sys.stderr.flush()
+                continue
+
             yield fraction_pushable_objects(dataset)
 
 def main(origin_stats_dir):

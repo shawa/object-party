@@ -9,7 +9,10 @@ def alternative_names(domain):
     '''
     for a given domain, return a set of all alternative names in its x509 cert
     '''
-    alts = json.loads(subprocess.check_output(['./domain-alts.sh', domain]))
+    try:
+        alts = json.loads(subprocess.check_output(['./domain-alts.sh', domain]))
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError("Failed to load certs")
     return frozenset(alts["alts"])
 
 
@@ -54,9 +57,15 @@ def count_size_and_occurences(filtered_har):
 
 def main():
     input_data = json.load(sys.stdin)
-    result = count_size_and_occurences(input_data)
-    json.dump(result, sys.stdout)
 
+    try:
+        result = count_size_and_occurences(input_data)
+    except RuntimeError as e:
+        sys.stderr.write(str(e))
+        sys.stderr.flush()
+        sys.exit(0)
+    else:
+        json.dump(result, sys.stdout)
 
 if __name__ == '__main__':
     main()
