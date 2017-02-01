@@ -13,8 +13,9 @@ src/ff_addons
 
 # Measurements
 src/har
-src/counted-domains/
-src/alternative-names/
+src/counted-domains
+src/counted-origin-stats
+src/alternative-names
 
 # Gecko runtime logs
 **/geckodriver.log
