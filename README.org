@@ -7,14 +7,50 @@ python3 main.py <domains>
 #+END_SRC
 Given a list of domains, ~main.py~ launches a Selenium session, driving Firefox. Firefox is configured to export a ~HAR~ (*H*ttp *AR*chive) for every page it loads, timestamped. The idea is to capture all of the domains for all of the objects on the page, with a view to determining how many of them are owned by the first party, and can thus, potentially, be pushed pre-emptively.
 
-** count-origins.sh
+** filter-har.sh
 #+BEGIN_SRC
-./count-origins.sh <input HAR file>
+./filter-har.sh <input HAR file>
 #+END_SRC
-Given a ~HAR~ which /is assumed to represent one page load only/, parse out the first-party domain (that is the very first request). Then, count the number of occurrences of each unique fetched subresource domain.
-
+Given a ~HAR~ which /is assumed to represent one page load only/, parse out the first-party domain (that is the very first request). Then, count the number of occurrences of each unique fetched subresource domain, along with the total bytes contribution of objects from that subdomain. Depends on:
+*** count-origin-stats
+   For a roughly-processed HAR file, that is a JSON file of the format:
+#+BEGIN_SRC javascript
+{
+  "domain": "first party domain name",
+  "objects": [
+    {
+      "url": "object domain name",
+      "bytes": "response size"
+    },
+    ...
+   ]
+}
+ #+END_SRC
+Reduce it to a list of object domains, the count of that domain, whether of l
+#+BEGIN_SRC javascript
+{
+  "domain": "first party domain name"
+  "objects": [
+    {
+      "domain": "object domain nam"
+      "count": "total occurences in HAR log",
+      "bytes": "total bytes fetched from this domain",
+      "is_first_party": "whether or not domain is an alternative name on first-party x509"
+    },
+    ...
+    ]
+}
+#+END_SRC
 ** fetch-alt-names.sh
 #+BEGIN_SRC
 ./fetch-alt-names.sh <domain counts file>
 #+END_SRC
 Given an output of ~count-origins.sh~, find all of the alternative names for the first party domain.
+** compute-pushability-stats.py
+For a directory of origin stats, each a json file in the format specified above, for every domain, compute the number of objects which are theoretically pushable from that domain, and the total number of bytes which are theoretically pushable. Output is in csv format, for example:
+
+#+BEGIN_SRC csv
+first party domain name,fraction pushable objects,fraction pushable bytes
+www.facebook.com,0.967741935483871,0.9999715523284758
+...
+#+END_SRC
