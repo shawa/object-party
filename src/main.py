@@ -8,9 +8,12 @@ import clize
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from datetime import datetime
 
-Driver = webdriver.firefox.webdriver.WebDriver
+GECKODRIVER_PATH = '/usr/local/bin/geckodriver' # type: str
+BINARY = FirefoxBinary(GECKODRIVER_PATH)
+Driver = webdriver.firefox.webdriver.WebDriver(firefox_binary=BINARY)
 
 TS_FMT = '%Y-%m-%d-%H-%M-%S'  # type: str
 TIMESTAMP = datetime.now().strftime(TS_FMT)  # type: str
@@ -93,7 +96,8 @@ def main(domainsfile, *, logdir='har'):
     driver = get_driver(ABOUT_CONFIG, EXTENSIONS)
 
     with open(domainsfile, 'r') as domains:
-        urls = tourls(domains)
+        crawl_targets = (u for u in domains if not u.startswith('#'))
+        urls = tourls(crawltargets)
         crawl(driver, urls)
 
     driver.close()
