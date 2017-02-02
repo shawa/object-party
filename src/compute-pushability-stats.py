@@ -23,11 +23,12 @@ def fraction_pushable_objects(dataset):
     total_objects = sum(objects.values())
     total_bytes = sum(content_bytes.values())
 
-    pushable_objects = objects['pushable'] / total_objects
-    pushable_bytes = content_bytes['pushable'] / total_bytes
-
     first_party = dataset['domain']
-    return first_party, pushable_objects, pushable_bytes
+    return (first_party,
+            objects['pushable'],
+            content_bytes['pushable'],
+            total_objects,
+            total_bytes)
 
 
 def analyse_batch_data(origin_stats_dir):
@@ -54,8 +55,10 @@ def main(origin_stats_dir):
     """
     writer = csv.writer(sys.stdout, delimiter=',')
     writer.writerow(["first party domain name",
-                     "fraction pushable objects",
-                     "fraction pushable bytes"])
+                     "pushable objects",
+                     "pushable bytes",
+                     "total objects",
+                     "total bytes"])
     for row in analyse_batch_data(origin_stats_dir):
         writer.writerow(row)
 
