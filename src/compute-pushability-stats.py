@@ -4,6 +4,9 @@ import os
 import csv
 import sys
 
+class BadRecordError(ValueError):
+    pass
+
 def fraction_pushable_objects(dataset):
     content_bytes = {
         'pushable': 0,
@@ -19,6 +22,9 @@ def fraction_pushable_objects(dataset):
         key = 'pushable' if obj['is_first_party'] else 'third_party'
         content_bytes[key] += obj['bytes']
         objects[key] += obj['count']
+
+    if -1 in content_bytes.values():
+        raise BadRecordError("Bytes should not be negative")
 
     total_objects = sum(objects.values())
     total_bytes = sum(content_bytes.values())
@@ -42,7 +48,11 @@ def analyse_batch_data(origin_stats_dir):
                 sys.stderr.flush()
                 continue
 
-            yield fraction_pushable_objects(dataset)
+            try:
+                row = fraction_pushable_objects(dataset)
+                yield row
+            except BadRecordError as e:
+                continue
 
 def main(origin_stats_dir):
     """For a dataset of domains, batch process the domain stats files
