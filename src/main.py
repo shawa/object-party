@@ -8,9 +8,8 @@ import clize
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from datetime import datetime
-
-Driver = webdriver.firefox.webdriver.WebDriver
 
 TS_FMT = '%Y-%m-%d-%H-%M-%S'  # type: str
 TIMESTAMP = datetime.now().strftime(TS_FMT)  # type: str
@@ -84,19 +83,24 @@ def crawl(driver, urls):
 
 
 def tourls(domains, protocol='http'):
-    for domain in domains:
+    rows = (l.split(',') for l in domains)
+    for number, domain in rows:
         yield protocol + '://' + domain
 
 
 def main(domainsfile, *, logdir='har'):
     logger.info('Launched crawler')
+
     driver = get_driver(ABOUT_CONFIG, EXTENSIONS)
+    try:
+        with open(domainsfile, 'r') as domains:
+            crawl_targets = (u for u in domains if not u.startswith('#'))
+            urls = tourls(crawl_targets)
+            crawl(driver, urls)
+    except KeyboardInterrupt:
+        logger.info('Killed, closing driver')
 
-    with open(domainsfile, 'r') as domains:
-        urls = tourls(domains)
-        crawl(driver, urls)
-
-    driver.close()
+    driver.quit()
 
 
 if __name__ == '__main__':
