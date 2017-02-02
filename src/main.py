@@ -11,10 +11,6 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from datetime import datetime
 
-GECKODRIVER_PATH = '/usr/local/bin/geckodriver' # type: str
-BINARY = FirefoxBinary(GECKODRIVER_PATH)
-Driver = webdriver.firefox.webdriver.WebDriver(firefox_binary=BINARY)
-
 TS_FMT = '%Y-%m-%d-%H-%M-%S'  # type: str
 TIMESTAMP = datetime.now().strftime(TS_FMT)  # type: str
 LOG_DIR = os.path.abspath('har') + '/' + TIMESTAMP  # type: str
@@ -97,7 +93,7 @@ def main(domainsfile, *, logdir='har'):
 
     with open(domainsfile, 'r') as domains:
         crawl_targets = (u for u in domains if not u.startswith('#'))
-        urls = tourls(crawltargets)
+        urls = tourls(crawl_targets)
         crawl(driver, urls)
 
     driver.close()
