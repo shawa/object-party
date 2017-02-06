@@ -23,7 +23,7 @@ def fraction_pushable_objects(dataset):
         content_bytes[key] += obj['bytes']
         objects[key] += obj['count']
 
-    if -1 in content_bytes.values():
+    if any(x < 0 for x in content_bytes.values()):
         raise BadRecordError("Bytes should not be negative")
 
     total_objects = sum(objects.values())

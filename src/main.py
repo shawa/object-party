@@ -14,7 +14,7 @@ from datetime import datetime
 TS_FMT = '%Y-%m-%d-%H-%M-%S'  # type: str
 TIMESTAMP = datetime.now().strftime(TS_FMT)  # type: str
 LOG_DIR = os.path.abspath('har') + '/' + TIMESTAMP  # type: str
-EXT_DIR = os.path.abspath('ff_addons') # type: str
+EXT_DIR = os.path.abspath('ff_addons')  # type: str
 
 EXTENSIONS = [EXT_DIR + '/' + filename
               for filename in os.listdir(EXT_DIR)]  # type: List[str]
@@ -32,6 +32,7 @@ ch = logging.StreamHandler()
 ch.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
 ch.setLevel(logging.DEBUG)
 logger.addHandler(ch)
+
 
 def get_driver(config: Dict[str, Union[bool, str]],
                extensions: List[str]) -> webdriver.firefox.webdriver.WebDriver:
